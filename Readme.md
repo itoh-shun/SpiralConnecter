@@ -177,8 +177,8 @@ SpiralDB::title('users')->fields(['id','email','name']);
 そこで簡単にアクセスできるようにModelを作りましょう。
 
 ~~~
-use framework\SpiralConnecter\SpiralModel;
-use framework\SpiralConnecter\SpiralManager;
+use SiLibrary\SpiralConnecter\SpiralModel;
+use SiLibrary\SpiralConnecter\SpiralManager;
 
 class User extends SpiralModel {
 
@@ -218,8 +218,8 @@ $user = User::createNewUser('hoge@sample.com', 'hoge', 'fuga' , 'hogefuga');
 
 primaryKey と一致するインスタンスを取得します。
 ~~~
-use framework\SpiralConnecter\SpiralModel;
-use framework\SpiralConnecter\SpiralManager;
+use SiLibrary\SpiralConnecter\SpiralModel;
+use SiLibrary\SpiralConnecter\SpiralManager;
 
 class User extends SpiralModel {
 
@@ -244,8 +244,8 @@ $user = User::findByEmailAddress('hoge@sample.com');
 
 条件に一致する情報をすべて配列で取得します。
 ~~~
-use framework\SpiralConnecter\SpiralModel;
-use framework\SpiralConnecter\SpiralManager;
+use SiLibrary\SpiralConnecter\SpiralModel;
+use SiLibrary\SpiralConnecter\SpiralManager;
 
 class User extends SpiralModel {
 
