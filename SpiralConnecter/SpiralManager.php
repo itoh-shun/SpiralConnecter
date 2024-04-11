@@ -25,7 +25,7 @@ class SpiralManager
     public function __construct(?SpiralConnecterInterface $connector = null)
     {
         if (is_null($connector)) {
-            $this->connection = SpiralDB::getConnection();
+            $this->connection = \SpiralDB::getConnection();
         } else {
             $this->connection = $connector;
         }
@@ -743,7 +743,7 @@ class SpiralManager
 
     public function registedRecordCount()
     {
-        $db = SpiralDB::title($this->request->get('db_title'))->paginate(1);
+        $db = \SpiralDB::title($this->request->get('db_title'))->paginate(1);
         return $db->getTotal();
     }
 
@@ -756,7 +756,7 @@ class SpiralManager
 
     public function nextId()
     {
-        $db = SpiralDB::title($this->request->get('db_title'))
+        $db = \SpiralDB::title($this->request->get('db_title'))
             ->orderBy('id', 'desc')
             ->paginate(1);
         return $db->getData()[0]->id + 1;

@@ -13,7 +13,7 @@ class SpiralFilterManager
     public function __construct(?SpiralConnecterInterface $connector = null)
     {
         if (is_null($connector)) {
-            $this->connection = SpiralDB::getConnection();
+            $this->connection = \SpiralDB::getConnection();
         } else {
             $this->connection = $connector;
         }
