@@ -1,4 +1,5 @@
 <?php 
+require_once 'Collection/require.php';
 require_once 'SpiralConnecter/Request/HttpRequestParameter.php';
 require_once 'SpiralConnecter/XSpiralApiHeaderObject.php';
 require_once 'SpiralConnecter/SpiralConnecterInterface.php';
