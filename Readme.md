@@ -8,6 +8,14 @@ SpiralのDBを簡単に扱うことができます。
 必須ライブラリ
 ※ https://github.com/itoh-shun/Collection/
 
+~~~
+<?php
+//<!-- SMP_DYNAMIC_PAGE DISPLAY_ERRORS=ON NAME=xxx -->
+require_once 'SpiralConnecter/require.php';
+
+var_dump(SpiralDB::title('hogeDB')->get());
+~~~
+
 
 ## SpiralDBの使い方（トークンシークレット利用する場合）
 トークンとシークレットを利用して接続する場合は、事前に設定が必要です。
