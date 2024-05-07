@@ -19,9 +19,11 @@ class SpiralConnecter implements SpiralConnecterInterface
         HttpRequestParameter $httpRequestParameter,
         array $files = []
     ) {
-        if(class_exists('SpiralApiRequest')) {
-            $request = new \SpiralApiRequest();
+        if(!class_exists('SpiralApiRequest')) {
+            throw new \LogicException('Not SpiralApiRequest Class');
         }
+
+        $request = new \SpiralApiRequest();
 
         foreach ($httpRequestParameter->toArray() as $key => $val) {
             $request->put($key, $val);

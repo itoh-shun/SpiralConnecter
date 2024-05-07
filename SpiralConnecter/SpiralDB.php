@@ -6,6 +6,7 @@ use SiLibrary\SpiralConnecter\SpiralExpressManager;
 use SiLibrary\SpiralConnecter\SpiralManager;
 use SiLibrary\SpiralConnecter\SpiralConnecter;
 use SiLibrary\SpiralConnecter\SpiralApiConnecter;
+use SiLibrary\SpiralConnecter\SpiralRedis;
 
 class SpiralDB
 {
@@ -19,6 +20,8 @@ class SpiralDB
 
     private static ?SpiralConnecterInterface $connecter = null;
 
+    private static ?SpiralRedis $cache = null;
+
     public static function setConnecter(SpiralConnecterInterface $connecter): void
     {
         if(!class_exists('SiLibrary\Collection')){
@@ -26,6 +29,23 @@ class SpiralDB
         }
 
         self::$connecter = $connecter;
+    }
+
+    public static function setCache(SpiralRedis $cache)
+    {
+        self::$cache = $cache;
+    }
+
+    public static function cacheFor(int $timeout = 900){
+        if($timeout > 900 || $timeout < 1){
+            throw new \LogicException('Invalid timeout value. It should be between 1 and 900.',500);
+        }
+
+        if(!class_exists('SpiralRedis')){
+            throw new \LogicException('Not SpiralRedis Library');
+        }
+
+        self::$cache && self::$cache->setTimeout($timeout);
     }
 
     public static function setToken(string $token, string $secret): void
@@ -50,7 +70,7 @@ class SpiralDB
 
     public static function title($title)
     {
-        return (new SpiralManager(self::$connecter))->setTitle($title);
+        return (new SpiralManager(self::$connecter , self::$cache))->setTitle($title);
     }
 
     public static function getConnection()
@@ -94,8 +114,7 @@ abstract class SpiralModel
 
     protected function init()
     {
-        $this->manager = (new SpiralManager(SpiralDB::getConnection()))
-            ->setTitle($this->db_title)
+        $this->manager = SpiralDB::title($this->db_title)
             ->fields($this->fields);
     }
 

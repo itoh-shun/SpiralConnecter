@@ -175,6 +175,42 @@ $data = [
 SpiralDB::title('db_title')->upsertBulk('userId',$data);
 ~~~
 
+## Cache を使おう
+Cache機能を使うことでリクエストを最小限に抑えることが可能です。
+
+初期設定
+~~~
+$cache = new SiLibrary\SpiralConnecter\SpiralRedis();
+
+SpiralDB::setCache($cache);
+SpiralDB::cacheFor(100);
+~~~
+利用したいキャッシュクラスをsetCacheで設定します。
+cacheForでタイムアウトの時間を設定します。
+
+この状態で、リクエストをかけます。
+~~~
+SpiralDB::title('db_title')->where('hoge','value')->fields(['name1','name2'])->get();
+~~~
+
+結果が返却され、その際に取得した結果をキャッシュに持ちます。
+
+そのまま2回目のリクエストをすると、キャッシュから返却されます。
+~~~
+SpiralDB::title('db_title')->where('hoge','value')->fields(['name1','name2'])->get();
+~~~
+
+キャッシュはSelectの際にセットされます。
+なお、対象のDBに対して update insert 等の操作をした場合はクリアされます。
+また、仮想DBのSelectをした場合もキャッシュがされますが、参照DBやマスタDBの更新時にキャッシュクリアがされませんので、ご注意ください。
+
+### キャッシュから取得したくない場合
+
+キャッシュから取得したくない場合はdontCacheを使用します。
+
+~~~
+SpiralDB::title('db_title')->dontCache()->where('hoge','value')->fields(['name1','name2'])->get();
+~~~
 
 ## Model を作ろう
 ~~~

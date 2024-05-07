@@ -21,9 +21,16 @@ class SpiralManager
     //private array $leftJoin = [];
     private array $join = [];
     private ?Collection $mstData = null;
+    private ?SpiralRedis $cache = null;
+    private bool $isCache = false;
 
-    public function __construct(?SpiralConnecterInterface $connector = null)
+    public function __construct(?SpiralConnecterInterface $connector = null , ?SpiralRedis $spiralRedis = null)
     {
+        if($spiralRedis){
+            $this->isCache = true;
+        }
+        $this->cache = $spiralRedis;
+
         if (is_null($connector)) {
             $this->connection = \SpiralDB::getConnection();
         } else {
@@ -48,6 +55,11 @@ class SpiralManager
     public function getTitle()
     {
         return $this->request->get('db_title');
+    }
+
+    public function dontCache(){
+        $this->isCache = false;
+        return $this;
     }
 
     /*
@@ -411,7 +423,7 @@ class SpiralManager
 
         $this->request->set('labels_target', 'all');
 
-        $response = $this->connection->request(
+        $response = $this->requestBuilder(
             $xSpiralApiHeader,
             $this->request
         );
@@ -518,7 +530,7 @@ class SpiralManager
 
         for ($page = 1; $page <= ceil($count / 1000); $page++) {
             $this->request->set('page', $page);
-            $response = $this->connection->request(
+            $response = $this->requestBuilder(
                 $xSpiralApiHeader,
                 $this->request
             );
@@ -555,6 +567,65 @@ class SpiralManager
         return $res;
     }
 
+    private function makeCacheKey(){
+        return md5($this->request->toJson());
+    }
+
+    private function requestBuilder(XSpiralApiHeaderObject $xSpiralApiHeader , HttpRequestParameter $httpRequestParameter){
+        $result = null;
+
+        if($xSpiralApiHeader->func() == 'database')
+        {
+            if($this->isCache){
+                $resultKeys = [];
+                if($this->cache->exists($this->request->get('db_title'))){
+                    $resultKeys = json_decode($this->cache->get($this->request->get('db_title')), true) ?? [];
+                }
+                $result = null;
+                if(in_array($this->makeCacheKey(),$resultKeys)){
+                    $result = $this->cache->get($this->makeCacheKey()) ?? null;
+                    $result = json_decode($result, true);
+                }
+
+            }
+            
+            if(!$result){
+                $result = $this->connection->request($xSpiralApiHeader, $this->request);
+            }
+
+            
+            if($this->isCache && $xSpiralApiHeader->method() == 'select'){
+                $resultKeys = [];
+                if($this->cache->exists($this->request->get('db_title'))){
+                    $resultKeys = json_decode($this->cache->get($this->request->get('db_title')), true) ?? [];
+                }
+                
+                if(!in_array($this->makeCacheKey(),$resultKeys)){
+                    $resultKeys[] = $this->makeCacheKey();
+                    $this->cache->set($this->request->get('db_title'), json_encode($resultKeys , true));
+                }
+                $this->cache->set($this->makeCacheKey(), json_encode($result, true));
+            }
+    
+            if($xSpiralApiHeader->method() != 'select'){
+                $resultKeys = [];
+                if($this->cache->exists($this->request->get('db_title'))){
+                    $resultKeys = json_decode($this->cache->get($this->request->get('db_title')), true) ?? [];
+                }
+    
+                foreach($resultKeys as $key) {
+                    $this->cache->delete($key);
+                }
+                
+                $this->cache->delete($this->request->get('db_title'));
+            }
+        } else {
+            $result = $this->connection->request($xSpiralApiHeader, $this->request);
+        }
+
+        return $result;
+    }
+
     public function getFile($fileField, $keyField, $value)
     {
         $this->request->set('db_title', $this->request->get('db_title'));
@@ -562,7 +633,7 @@ class SpiralManager
         $this->request->set('key_field_title', $keyField);
         $this->request->set('key_field_value', $value);
         $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'get_file');
-        return $this->connection->request($xSpiralApiHeader, $this->request);
+        return $this->requestBuilder($xSpiralApiHeader, $this->request);
     }
 
     public function create(array $create)
@@ -575,7 +646,7 @@ class SpiralManager
         }
 
         $this->request->set('data', $data);
-        $res = $this->connection->request($xSpiralApiHeader, $this->request);
+        $res = $this->requestBuilder($xSpiralApiHeader, $this->request);
 
         $create['id'] = $res['id'];
 
@@ -604,7 +675,7 @@ class SpiralManager
         foreach (array_chunk($data, 1000) as $d) {
             $this->request->set('data', $d);
 
-            $this->connection->request($xSpiralApiHeader, $this->request);
+            $this->requestBuilder($xSpiralApiHeader, $this->request);
         }
 
         return true;
@@ -620,7 +691,7 @@ class SpiralManager
         }
 
         $this->request->set('data', $data);
-        $res = $this->connection->request($xSpiralApiHeader, $this->request);
+        $res = $this->requestBuilder($xSpiralApiHeader, $this->request);
 
         return (int) $res['count'];
     }
@@ -637,7 +708,7 @@ class SpiralManager
         $this->request->set('key', $uniqKey);
         $this->request->set('data', $data);
 
-        $res = $this->connection->request($xSpiralApiHeader, $this->request);
+        $res = $this->requestBuilder($xSpiralApiHeader, $this->request);
 
         return (int) $res['status'];
     }
@@ -652,7 +723,7 @@ class SpiralManager
     public function delete(): int
     {
         $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'delete');
-        $res = $this->connection->request($xSpiralApiHeader, $this->request);
+        $res = $this->requestBuilder($xSpiralApiHeader, $this->request);
         return (int) $res['count'];
     }
 
@@ -660,7 +731,7 @@ class SpiralManager
     {
         $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'delete');
         $this->where('id', $id, '=');
-        $this->connection->request($xSpiralApiHeader, $this->request);
+        $this->requestBuilder($xSpiralApiHeader, $this->request);
     }
 
     public function updateBulk($primaryKey, $update)
@@ -687,7 +758,7 @@ class SpiralManager
 
         foreach (array_chunk($data, 1000) as $d) {
             $this->request->set('data', $d);
-            $res = $this->connection->request(
+            $res = $this->requestBuilder(
                 $xSpiralApiHeader,
                 $this->request
             );
@@ -721,7 +792,7 @@ class SpiralManager
 
         foreach (array_chunk($data, 1000) as $d) {
             $this->request->set('data', $d);
-            $res = $this->connection->request(
+            $res = $this->requestBuilder(
                 $xSpiralApiHeader,
                 $this->request
             );
@@ -734,7 +805,7 @@ class SpiralManager
     public function schema()
     {
         $xSpiralApiHeader = new XSpiralApiHeaderObject('database', 'get');
-        $response = $this->connection->request(
+        $response = $this->requestBuilder(
             $xSpiralApiHeader,
             $this->request
         );
