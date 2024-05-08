@@ -3,7 +3,6 @@
 namespace SiLibrary\SpiralConnecter;
 
 use SiLibrary\Collection;
-use HttpRequestParameter;
 
 class SpiralFilterManager
 {

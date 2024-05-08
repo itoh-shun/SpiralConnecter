@@ -2,8 +2,6 @@
 
 namespace SiLibrary\SpiralConnecter;
 
-use HttpRequestParameter;
-
 interface SpiralConnecterInterface
 {
     public function request(

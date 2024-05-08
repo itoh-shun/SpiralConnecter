@@ -1,5 +1,6 @@
 <?php
 
+namespace SiLibrary\SpiralConnecter;
 class HttpRequest
 {
     protected $url = '';
@@ -121,7 +122,7 @@ class HttpRequest
             $stat = curl_multi_exec($mh, $running);
         } while ($stat === CURLM_CALL_MULTI_PERFORM);
         if (!$running || $stat !== CURLM_OK) {
-            throw new RuntimeException('リクエストが開始出来なかった。');
+            throw new \RuntimeException('リクエストが開始出来なかった。');
         }
         $responses = [];
         do {
@@ -148,7 +149,7 @@ class HttpRequest
                             );
 
                             if ($response === false) {
-                                throw new RuntimeException('リクエストエラー');
+                                throw new \RuntimeException('リクエストエラー');
                             }
                             //$info = curl_getinfo($raised['handle']);
                             //$url = parse_url($info['url']);
@@ -193,7 +194,7 @@ class HttpRequest
             $stat = curl_multi_exec($mh, $running);
         } while ($stat === CURLM_CALL_MULTI_PERFORM);
         if (!$running || $stat !== CURLM_OK) {
-            throw new RuntimeException('リクエストが開始出来なかった。');
+            throw new \RuntimeException('リクエストが開始出来なかった。');
         }
         $responses = [];
         do {
@@ -220,7 +221,7 @@ class HttpRequest
                             );
 
                             if ($response === false) {
-                                throw new RuntimeException('リクエストエラー');
+                                throw new \RuntimeException('リクエストエラー');
                             }
                             $info = curl_getinfo($raised['handle']);
                             $url = parse_url($info['url']);

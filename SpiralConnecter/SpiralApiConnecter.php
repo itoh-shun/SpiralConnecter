@@ -3,8 +3,6 @@
 namespace SiLibrary\SpiralConnecter;
 
 use Exception;
-use HttpRequest;
-use HttpRequestParameter;
 
 class SpiralApiConnecter implements SpiralConnecterInterface
 {

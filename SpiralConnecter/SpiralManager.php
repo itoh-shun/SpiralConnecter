@@ -3,8 +3,6 @@
 namespace SiLibrary\SpiralConnecter;
 
 use SiLibrary\Collection;
-use SiLibrary\Exception\NotFoundException;
-use HttpRequestParameter;
 use LogicException;
 
 class SpiralManager

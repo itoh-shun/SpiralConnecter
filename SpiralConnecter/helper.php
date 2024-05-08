@@ -1,6 +1,7 @@
 <?php
-
-function spiral(){
-    global $SPIRAL;
-    return $SPIRAL;
+if(!function_exists('spiral')){
+    function spiral(){
+        global $SPIRAL;
+        return $SPIRAL;
+    }
 }

@@ -2,7 +2,6 @@
 
 namespace SiLibrary\SpiralConnecter;
 
-use HttpRequestParameter;
 use LogicException;
 
 class SpiralExpressManager

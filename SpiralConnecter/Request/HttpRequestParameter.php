@@ -1,6 +1,7 @@
 <?php
 
-class HttpRequestParameter extends stdClass
+namespace SiLibrary\SpiralConnecter;
+class HttpRequestParameter extends \stdClass
 {
     public function __construct(array $array = [])
     {
