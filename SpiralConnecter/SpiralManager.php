@@ -336,7 +336,7 @@ class SpiralManager
         string $toField,
         string $asDbName = ''
     ) {
-        $join = new JoinDb($db, $field, $op, $toField, $asDbName, true);
+        $join = new JoinDb($db, $field, $op, $toField, $asDbName);
         $join->setHasOne();
         $this->join[] = $join;
         return $this;
