@@ -576,7 +576,7 @@ class SpiralManager
 
         if($xSpiralApiHeader->func() == 'database')
         {
-            if($this->isCache){
+            if($this->isCache && $xSpiralApiHeader->method() == 'select'){
                 $resultKeys = [];
                 if($this->cache->exists($this->request->get('db_title'))){
                     $resultKeys = json_decode($this->cache->get($this->request->get('db_title')), true) ?? [];
@@ -586,7 +586,6 @@ class SpiralManager
                     $result = $this->cache->get($this->makeCacheKey()) ?? null;
                     $result = json_decode($result, true);
                 }
-
             }
             
             if(!$result){
@@ -607,7 +606,7 @@ class SpiralManager
                 $this->cache->set($this->makeCacheKey(), json_encode($result, true));
             }
     
-            if($xSpiralApiHeader->method() != 'select'){
+            if($this->isCache && $xSpiralApiHeader->method() != 'select'){
                 $resultKeys = [];
                 if($this->cache->exists($this->request->get('db_title'))){
                     $resultKeys = json_decode($this->cache->get($this->request->get('db_title')), true) ?? [];

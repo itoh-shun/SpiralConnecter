@@ -18,7 +18,7 @@ class HttpRequest
         $this->httpHeader = $header;
     }
 
-    public function get(HttpRequestParameter $param)
+    public function get(HttpRequestParameter $param = null)
     {
         $curl = curl_init();
         curl_setopt(
