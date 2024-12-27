@@ -68,7 +68,6 @@ class SpiralWebManager
             'action' => $action,
         ];
 
-
         return $this;
     }
     public function getTable(int $limit)
