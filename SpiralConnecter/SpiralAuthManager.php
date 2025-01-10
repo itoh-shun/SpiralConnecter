@@ -1,5 +1,7 @@
 <?php
 
+namespace SiLibrary\SpiralConnecter;
+
 class SpiralAuthManager
 {
     private $connection;
@@ -22,7 +24,8 @@ class SpiralAuthManager
         return $this;
     }
 
-    public function login($id , $password = ''){
+    public function login($id, $password = '')
+    {
         $this->request->set('my_area_title', $this->myAreaTitle);
         $this->request->set('url_type', '2');
         $this->request->set('id', $id);
@@ -36,7 +39,8 @@ class SpiralAuthManager
         );
     }
 
-    public function logout(){
+    public function logout()
+    {
         $this->request->set('my_area_title', $this->myAreaTitle);
         $this->request->set('jsessionid', $_COOKIE['JSESSIONID']);
 

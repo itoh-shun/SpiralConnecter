@@ -31,7 +31,7 @@ namespace SiLibrary\SpiralConnecter {
 
         public static function auth($my_area_title)
         {
-            return (new \SpiralAuthManager(self::$connecter))->setMyAreaTitle($my_area_title);
+            return (new SpiralAuthManager(self::$connecter))->setMyAreaTitle($my_area_title);
         }
 
         public static function getConnection()
